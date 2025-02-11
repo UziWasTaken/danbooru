@@ -1,14 +1,20 @@
 #!/bin/bash
 
+# Create and set permissions for bundle directory
+mkdir -p vendor/bundle
+chmod -R 777 vendor/bundle
+
 # Update bundler
 gem update --system
 gem install bundler -v 2.5.5
 
-# Update Gemfile.lock for dtext_rb
-sed -i 's/dtext_rb (1.13.0)/dtext_rb (1.14.0)/' Gemfile.lock
+# Set bundle config
+bundle config set --local path 'vendor/bundle'
+bundle config set --local deployment 'true'
+bundle config set --local without 'development test'
 
 # Install Ruby dependencies
-BUNDLE_WITHOUT="development test" bundle install
+bundle install
 
 # Install Node dependencies
 npm install
@@ -20,7 +26,7 @@ npm run build
 mkdir -p public
 
 # Copy built files to public directory
-cp -r dist/* public/
+cp -r dist/* public/ 2>/dev/null || :
 
 # Copy static assets
 cp -r static/* public/ 2>/dev/null || :

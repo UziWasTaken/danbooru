@@ -1,6 +1,6 @@
 [build]
 command = "sh ./build.sh"
-publish = "public"
+pages_build_output_dir = "public"
 
 [build.environment]
 NODE_VERSION = "20.9.0"
