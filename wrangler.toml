@@ -5,6 +5,9 @@ pages_build_output_dir = "public"
 [build.environment]
 NODE_VERSION = "20.9.0"
 RUBY_VERSION = "3.3.2"
+BUNDLE_DEPLOYMENT = "false"
+BUNDLE_PATH = "vendor/bundle"
+BUNDLE_WITHOUT = "development:test"
 
 [site]
 bucket = "./public"
