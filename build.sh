@@ -4,35 +4,33 @@
 mkdir -p vendor/bundle
 chmod -R 777 vendor/bundle
 
-# Update bundler
+# Update bundler and install required gems directly
 gem update --system
 gem install bundler -v 2.5.5
+gem install dtext_rb -v 1.14.2
 
-# Remove both Gemfile.lock and backup the original Gemfile
+# Clean existing files
 rm -f Gemfile.lock
-cp Gemfile Gemfile.backup
+rm -rf vendor/bundle/*
 
-# Update dtext_rb version in Gemfile
-sed -i 's/gem "dtext_rb".*$/gem "dtext_rb", "~> 1.14.2"/' Gemfile
-if [ $? -ne 0 ]; then
-    # If sed fails, restore from backup and try different approach
-    cp Gemfile.backup Gemfile
-    # Remove the old dtext_rb line if it exists
-    sed -i '/gem "dtext_rb"/d' Gemfile
-    # Add the new version
-    echo 'gem "dtext_rb", "~> 1.14.2"' >> Gemfile
-fi
+# Create a fresh Gemfile
+mv Gemfile Gemfile.original
+cat > Gemfile << EOL
+source 'https://rubygems.org'
+
+gem 'dtext_rb', '1.14.2'
+EOL
+
+cat Gemfile.original >> Gemfile
+rm Gemfile.original
 
 # Set bundle config
 bundle config set --local path 'vendor/bundle'
 bundle config set --local deployment 'false'
 bundle config set --local without 'development test'
 
-# Clean any existing gems
-rm -rf vendor/bundle/*
-
-# Install Ruby dependencies with clean slate
-bundle install --clean
+# Install dependencies with clean slate
+bundle install --clean --jobs 4 --retry 3
 
 # Install Node dependencies
 export NODE_OPTIONS="--max_old_space_size=4096"
@@ -53,7 +51,4 @@ cp -r static/* public/ 2>/dev/null || :
 # Ensure database migrations are in place
 if [ -d "db/migrations" ]; then
   cp -r db/migrations public/
-fi
-
-# Cleanup
-rm -f Gemfile.backup 
+fi 
