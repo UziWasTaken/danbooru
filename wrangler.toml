@@ -1,0 +1,10 @@
+[build]
+command = "sh ./build.sh"
+publish = "public"
+
+[build.environment]
+NODE_VERSION = "20.9.0"
+
+[site]
+bucket = "./public"
+entry-point = "workers-site" 
