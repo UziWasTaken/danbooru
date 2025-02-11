@@ -8,12 +8,22 @@ chmod -R 777 vendor/bundle
 gem update --system
 gem install bundler -v 2.5.5
 
+# Update dtext_rb in Gemfile.lock
+if [ -f "Gemfile.lock" ]; then
+  sed -i 's/dtext_rb (1.13.0)/dtext_rb (1.14.2)/g' Gemfile.lock
+  # Remove the Gemfile.lock if sed fails
+  if [ $? -ne 0 ]; then
+    rm -f Gemfile.lock
+  fi
+fi
+
 # Set bundle config
 bundle config set --local path 'vendor/bundle'
-bundle config set --local deployment 'true'
+bundle config set --local deployment 'false'
 bundle config set --local without 'development test'
 
-# Install Ruby dependencies
+# Install Ruby dependencies with updated gems
+bundle update dtext_rb
 bundle install
 
 # Install Node dependencies
